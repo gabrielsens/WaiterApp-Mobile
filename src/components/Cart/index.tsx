@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
 import { CartItem } from '../../Types/CartItem';
 import { Product } from '../../Types/Product';
+import { api } from '../../Utils/api';
 import { formatCurrency } from '../../Utils/formatCurrency';
 import Button from '../Button';
 import { MinusCircle } from '../Icons/MinusCircle';
@@ -15,18 +16,30 @@ interface CartProps {
   onAddToCart: (product: Product) => void;
   onDecrementCart: (product: Product) => void;
   onConfirmOrder: () => void;
+  selectedTable: string
 }
 
-export default function Cart({ cartItems, onAddToCart, onDecrementCart, onConfirmOrder }: CartProps) {
-  const [isLoading] = useState(false);
+export default function Cart({ cartItems, onAddToCart, onDecrementCart, onConfirmOrder, selectedTable }: CartProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const total = cartItems
     .reduce((acc, cartItem) => acc + (cartItem.quantity * cartItem.product.price), 0);
 
-  function handleConfirmOrder() {
+  async function handleConfirmOrder() {
+    setIsLoading(true);
+    const payload = {
+      table: selectedTable,
+      products: cartItems.map((cartItem) => ({
+        product: cartItem.product._id,
+        quantity: cartItem.quantity,
+      }))
+    };
+    await api.post('/orders', payload);
     setIsModalVisible(true);
+    setIsLoading(false);
   }
+
 
   function handleOk() {
     onConfirmOrder();
@@ -49,7 +62,7 @@ export default function Cart({ cartItems, onAddToCart, onDecrementCart, onConfir
             <Item>
               <ProductContainer>
                 <Image source={{
-                  uri: `http://192.168.0.12:3001/uploads/${cartItem.product.imagePath}`
+                  uri: `http://192.168.0.7:3001/uploads/${cartItem.product.imagePath}`
                 }} />
                 <QuantityContainer>
                   <Text size={14} color="#666">{cartItem.quantity}x</Text>

@@ -26,7 +26,7 @@ export default function ProductModal({ visible, onClose, product, onAddToCart }:
     <Modal visible={visible} animationType="slide" presentationStyle='pageSheet' onRequestClose={onClose}>
       <Image
         source={{
-          uri: `http://192.168.0.12:3001/uploads/${product.imagePath}`
+          uri: `http://192.168.0.7:3001/uploads/${product.imagePath}`
         }}
       >
         <ButtonClose onPress={onClose}>
